@@ -1,3 +1,5 @@
+# Check the list to find numbers whose sum is 0
+
 def find0(listA):
     if 0 in listA:
         return("We have a sum! It's just 0!")
