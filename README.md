@@ -1,7 +1,7 @@
 # Python
 Projects produced in Python
 
-Battleship.py is a basic version of battleship where each ship only consists of one space instead of multiple. Produced in CodeAcademy's Python 2 course.
+Battleship.py is a basic version of battleship where each ship only consists of one space instead of multiple. Originally produced in CodeAcademy's Python 2 course. Updated to Python 3.x
 
 fake_album_cover.py generates a random fake album cover consisting of an open source image and titles from random wikipedia pages.
 
