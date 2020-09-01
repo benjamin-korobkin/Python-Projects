@@ -1,4 +1,4 @@
-## Tkinter practice
+## CONNECT 4 - made in TKinter
 ## TODO: Draw a line through the winning pieces
 import tkinter as tk
 from tkinter import *
