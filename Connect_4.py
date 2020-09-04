@@ -1,5 +1,4 @@
-## CONNECT 4 - made in TKinter
-## TODO: Draw a line through the winning pieces
+## Tkinter practice
 import tkinter as tk
 from tkinter import *
 
@@ -19,16 +18,17 @@ def select(event):
             row+=1
         else:
             break
-    # fill lowest piece red
+    # fill lowest empty piece 
     canvas.itemconfig(board[row][col], fill=plyr)
-    canvas.itemconfig(board[row][col], tags=(plyr)) # may need col too
-    
+    canvas.itemconfig(board[row][col], tags=(plyr))
     checkWin(row, col, vertical)
-    checkWin(row, col, horizontal)
-    checkWin(row, col, downRight)
-    checkWin(row, col, upRight)
+    if not gameOver:
+        checkWin(row, col, horizontal)
+    if not gameOver:
+        checkWin(row, col, downRight)
+    if not gameOver:
+        checkWin(row, col, upRight)
     
-    ## TODO: Draw games
     draw = True
     for piece in board[0]:
         colors=canvas.gettags(piece)
@@ -54,8 +54,13 @@ def select(event):
     canvas.itemconfig(gameText, fill=plyr, text=newText)
         
 def checkWin(row, col, dir):
-    global gameOver, board, canvas, plyr
+    global gameOver, board, canvas, plyr, winCoords
     count = 0
+    startCoords=[]
+    endCoords=[]
+    ## Get coords of piece to start/end line
+    ## start & end (x1+x2) / 2, (y1+y2) / 2
+    
     ## Check vertically
     if dir == vertical:
         for i in range(3):
@@ -67,7 +72,11 @@ def checkWin(row, col, dir):
             p = board[row][col]
             if plyr in canvas.gettags(p):
                 count+=1
-                if count == 4:
+                if count==1:
+                    startPoint = canvas.coords(p)
+                if count==4:
+                    addLineCoords(startPoint, "start")
+                    addLineCoords(canvas.coords(p),"end")
                     gameOver = True
             else:
                 count=0
@@ -87,7 +96,11 @@ def checkWin(row, col, dir):
             p = board[row][col]
             if plyr in canvas.gettags(p):
                 count+=1
+                if count==1:
+                    startPoint = canvas.coords(p)
                 if count==4:
+                    addLineCoords(startPoint, "start")
+                    addLineCoords(canvas.coords(p), "end")
                     gameOver = True
             else:
                 count=0
@@ -108,7 +121,11 @@ def checkWin(row, col, dir):
             p = board[row][col]
             if plyr in canvas.gettags(p):
                 count+=1
+                if count==1:
+                    startPoint = canvas.coords(p)
                 if count==4:
+                    addLineCoords(startPoint, "start")
+                    addLineCoords(canvas.coords(p), "end")
                     gameOver = True
             else:
                 count=0
@@ -129,7 +146,11 @@ def checkWin(row, col, dir):
             p = board[row][col]
             if plyr in canvas.gettags(p):
                 count+=1
+                if count==1:
+                    startPoint = canvas.coords(p)
                 if count==4:
+                    addLineCoords(startPoint, "start")
+                    addLineCoords(canvas.coords(p), "end")
                     gameOver = True
             else:
                 count=0
@@ -139,13 +160,34 @@ def checkWin(row, col, dir):
             else:
                 break
     
+    if gameOver:
+        canvas.create_line(winCoords["x1"], winCoords["y1"], winCoords["x2"], winCoords["y2"], fill="#FCFCFC", width="3p", arrow=tk.BOTH)
+
+def addLineCoords(coords, pos):
+    global winCoords
+    if pos == "start":
+        winCoords["x1"] = (coords[0] + coords[2]) / 2
+        winCoords["y1"] = (coords[1] + coords[3]) / 2
+    elif pos == "end":
+        winCoords["x2"] = (coords[0] + coords[2]) / 2
+        winCoords["y2"] = (coords[1] + coords[3]) / 2
+
 def pretty(event):
     print("VERY NICE!!!")
 
 def newGame():
-    global board, gameText, canvas, plyr, newGameButton, gameOver
-    newGameButton.pack_forget()
+    global canvas, newGameButton,colors, p1,p2
+    colors = ["red","black","green","blue","magenta"]
+    p1 = ''
+    p2 = ''
     canvas.delete("all")
+    newGameButton.pack_forget()
+    showColorOptions("1")
+
+def setupBoard():
+    global gameOver, canvas, gameText, board, plyr
+    # Draw the board
+    canvas.delete(ALL)
     board=[]
     gameText=""
     gameOver=False
@@ -154,7 +196,6 @@ def newGame():
     rowStart = 50
     rowPos = rowStart
     colPos = colStart
-    # Populate the board with the pieces
     for x in range(6):
         new_list=[]
         for y in range(7):
@@ -162,22 +203,41 @@ def newGame():
             colPos += 55
             new_list.append(spot)
         rowPos += 50
-        colPos = colStart ## reset back to left side
+        colPos = colStart
         board.append(new_list)
-
     canvas.tag_bind("piece", '<Button-1>', select)
     gameText = canvas.create_text(250, rowPos + 65, fill=plyr, font='Arial 20 bold', text=plyr.upper() + "'s TURN")
-    #canvas.create_text(x, y, fill='', font='', text='')
     canvas.pack()
+
+def pickColor(event):
+    global p1, p2, gameText, colors
+    if p1 == '':
+        p1 = canvas.gettags(CURRENT)[0]
+        colors.remove(p1)
+        canvas.delete(colors[-1])
+        canvas.delete(p1)
+        showColorOptions("2")
+    else:
+        p2 = canvas.gettags(CURRENT)[0]
+        setupBoard()
+
+def showColorOptions(p):
+    global colors, gameText, p1
+    if p == "1":
+        gameText = canvas.create_text(250, 300, font='Arial 20 bold', text="Player " + p + " - Choose your color")
+    else:
+        canvas.itemconfig(gameText, text="Player " + p + " - Choose your color")
+    startX = 65
+    startY = 150
+    for color in colors:
+        option = canvas.create_oval(startX, startY, startX+45, startY+45, fill=color, tags=color)
+        canvas.tag_bind(color, '<Button-1>', pickColor)
+        startX+=80
     
-#canvas.itemconfig(board[0][2], fill="red")
-## pieces are configured as: board[row][column]
-
-#for column in board:
-#    for piece in column:
-#        canvas.itemconfig(piece, fill="red")
-
+    
 root = tk.Tk()
+root.title("CONNECT 4")
+root.geometry('500x550')
 
 ## Directions to check
 vertical = 1
@@ -185,43 +245,27 @@ horizontal = 2
 downRight = 3
 upRight = 4
 
-## TODO Allow customized colors
-p1 = 'red'
-p2 = 'black'
-
+## Coordinates for the drawing the winning line
+winCoords = {}
 gameOver = False
-## Rename window title
-root.title("CONNECT 4")
-## Set window size
-
-root.geometry('500x550')
+p1 = ''
+p2 = ''
+plyr=p1
 board = []
-canvas = Canvas(root, width=500, height=500, bg="white")
+colors = []
+canvas = Canvas(root, width=500, height=500, bg="#DCDCDC")
 canvas.pack()
-gameText=""
+gameText = canvas.create_text(250, 300, font='Arial 20 bold', text="Player 1 - Choose your color")
 newGameButton = Button(root, text="New Game", command=newGame, justify=CENTER)
-newGameButton.pack()
-## Essential
+newGame()
 root.mainloop()
 
 ## To interact w objects in canvas, use tag_bind()
 ## tag_bind(item, event=None, callback, add=None)
 ## item can be a tag or id
 
-#if 'red' in tags or 'black' in tags:
-    #    print("FILLED")
-    #else:
-    #    print("EMPTY")
-    #    canvas.itemconfig(CURRENT, fill="red")
-    #    canvas.addtag_withtag("red", CURRENT)
-    # We can get the type of object selected
-    #print(canvas.type(CURRENT))
-    # We can get the color of the piece
-    #print(canvas.itemcget(CURRENT, 'fill'))
-
-    #if plyr==1:
-        #canvas.itemconfig("current", fill="red")
-        #plyr=2
-    #else:
-        #canvas.itemconfig("current", fill="black")
-        #plyr=1
+#    canvas.addtag_withtag("red", CURRENT)
+# We can get the type of object selected
+#print(canvas.type(CURRENT))
+# We can get the color of the piece
+#print(canvas.itemcget(CURRENT, 'fill'))
