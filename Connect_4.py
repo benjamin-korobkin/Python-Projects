@@ -8,12 +8,18 @@ def select(event):
     col = -1
     nums = ['0','1','2','3','4','5','6']
     tags = canvas.gettags(CURRENT)
+    ## My guess is we are selecting effectively nothing if 
+	## we select a piece already colored.
+    if not tags:
+        return
+    #print(tags)
     for s in tags:
         if s in nums:
            col = int(s)
     while row < 5:
         piece = board[row+1][col]
         cur_tags = canvas.gettags(piece)
+        #print(cur_tags)
         if p1 not in cur_tags and p2 not in cur_tags:
             row+=1
         else:
@@ -31,18 +37,18 @@ def select(event):
     
     draw = True
     for piece in board[0]:
-        colors=canvas.gettags(piece)
-        if p1 not in colors and p2 not in colors:
+        cur_colors=canvas.gettags(piece)
+        if p1 not in colors and p2 not in cur_colors:
             draw = False
             break
 
     if gameOver:
         newText = plyr.upper() + " WINS!!!"
-        canvas.tag_bind("piece", '<Button-1>', pretty)
+        canvas.tag_bind("piece", '<Button-1>', '')
         newGameButton.pack()
     elif draw:
         newText = "DRAW"
-        canvas.tag_bind("piece", '<Button-1>', pretty)
+        canvas.tag_bind("piece", '<Button-1>', '')
         newGameButton.pack()
     else:
         if plyr == p1:
@@ -172,9 +178,6 @@ def addLineCoords(coords, pos):
         winCoords["x2"] = (coords[0] + coords[2]) / 2
         winCoords["y2"] = (coords[1] + coords[3]) / 2
 
-def pretty(event):
-    print("VERY NICE!!!")
-
 def newGame():
     global canvas, newGameButton,colors, p1,p2
     colors = ["red","black","green","blue","magenta"]
@@ -217,12 +220,12 @@ def pickColor(event):
         canvas.delete(colors[-1])
         canvas.delete(p1)
         showColorOptions("2")
-    else:
+    elif p2 == '':  ## Leaving this as else created a bug. Must've reassigned p2.
         p2 = canvas.gettags(CURRENT)[0]
         setupBoard()
 
 def showColorOptions(p):
-    global colors, gameText, p1
+    global colors, gameText
     if p == "1":
         gameText = canvas.create_text(250, 300, font='Arial 20 bold', text="Player " + p + " - Choose your color")
     else:
