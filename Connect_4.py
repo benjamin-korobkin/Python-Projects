@@ -8,7 +8,7 @@ def select(event):
     col = -1
     nums = ['0','1','2','3','4','5','6']
     tags = canvas.gettags(CURRENT)
-    ## My guess is we are selecting effectively nothing if 
+    ## My guess is we are selecting effectively nothing if
 	## we select a piece already colored.
     if not tags:
         return
@@ -24,7 +24,7 @@ def select(event):
             row+=1
         else:
             break
-    # fill lowest empty piece 
+    # fill lowest empty piece
     canvas.itemconfig(board[row][col], fill=plyr)
     canvas.itemconfig(board[row][col], tags=(plyr))
     checkWin(row, col, vertical)
@@ -37,8 +37,8 @@ def select(event):
     
     draw = True
     for piece in board[0]:
-        cur_colors=canvas.gettags(piece)
-        if p1 not in colors and p2 not in cur_colors:
+        cur_colors = canvas.gettags(piece)
+        if p1 not in cur_colors and p2 not in cur_colors:
             draw = False
             break
 
@@ -58,7 +58,7 @@ def select(event):
         newText = plyr.upper() + "'s TURN"
 
     canvas.itemconfig(gameText, fill=plyr, text=newText)
-        
+    
 def checkWin(row, col, dir):
     global gameOver, board, canvas, plyr, winCoords
     count = 0
@@ -115,37 +115,37 @@ def checkWin(row, col, dir):
             else:
                 break
     
-    ## downRight
+    # downRight
     elif dir == downRight:
         for i in range(3):
             if col < 6 and row < 5:
-                col+=1
-                row+=1
+                col += 1
+                row += 1
             else:
                 break
         for k in range(6):
             p = board[row][col]
             if plyr in canvas.gettags(p):
-                count+=1
-                if count==1:
+                count += 1
+                if count == 1:
                     startPoint = canvas.coords(p)
-                if count==4:
+                if count == 4:
                     addLineCoords(startPoint, "start")
                     addLineCoords(canvas.coords(p), "end")
                     gameOver = True
             else:
-                count=0
+                count = 0
             if col-1 >= 0 and row-1 >= 0:
-                col-=1
-                row-=1
+                col -= 1
+                row -= 1
             else:
                 break
     # upRight
     elif dir == upRight:
         for i in range(3):
             if col > 0 and row < 5:
-                col-=1
-                row+=1
+                col -= 1
+                row += 1
             else:
                 break
         for j in range(6):
